@@ -23,7 +23,7 @@ router.get("/:gid", getAllComments);
 router.get("/:cid", getSingleComment);
 
 // Protect all routes after this middleware
-// router.use(requireAuth)
+router.use(requireAuth)
 
 // Create a comment
 router.post("/", createComment);

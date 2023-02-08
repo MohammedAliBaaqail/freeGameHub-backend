@@ -70,8 +70,8 @@ const updateComment = async (req, res) => {
     if (!comment) {
       return res.status(400).json({error: 'No such comment'})
     }
-  
-    res.status(200).json(comment)
+    const newComment = await Comment.findById(cid)
+    res.status(200).json(newComment)
   }
 
 
