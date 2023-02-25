@@ -8,17 +8,26 @@ const userSchema = new Schema({
   email: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
+    
   },
   username: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
+    minlength: 3,
+    maxlength: 20,
+    
   },
   password: {
     type: String,
     required: true
-  }
+  },
+  favouriteGames: {
+    type: Array,
+    
+    default: []
+  },
 })
 
 // static signup method
@@ -72,5 +81,48 @@ userSchema.statics.login = async function(email, password) {
 
   return user
 }
+userSchema.statics.getFavouriteGames = async function(username) {
+  const user = await this.findOne({ username })
+
+  if (!user) {
+    throw Error('Incorrect username')
+  }
+  return user.favouriteGames
+}
+
+
+userSchema.statics.addFavouriteGame = async function(username, game) {
+  const user = await this.findOne({ username })
+  
+  if (!user) {
+    throw Error('Incorrect username')
+  }
+  const favouriteGames = user.favouriteGames
+  // check if game is already in favouriteGames
+  const gameExists = favouriteGames.find(favouriteGame => favouriteGame === game)
+  if (gameExists) {
+    throw Error('Game already in favourites')
+  }
+
+  favouriteGames.push(game)
+  const updatedUser = await this.findOneAndUpdate({ username }, { favouriteGames }, { new: true })
+  return updatedUser.favouriteGames
+  
+
+}
+
+userSchema.statics.removeFavouriteGame = async function(username, game) {
+  const user = await this.findOne({ username })
+  if (!user) {
+    throw Error('Incorrect username')
+  }
+  console.log(user)
+  const favouriteGames = user.favouriteGames.filter(favouriteGame => favouriteGame !== game)
+
+  const updatedUser = await this.findOneAndUpdate({ username }, { favouriteGames }, { new: true })
+  return updatedUser.favouriteGames
+
+}
+
 
 module.exports = mongoose.model('User', userSchema)
