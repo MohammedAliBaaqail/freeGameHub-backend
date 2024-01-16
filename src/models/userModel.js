@@ -1,6 +1,8 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const validator = require('validator')
+const jwt = require('jsonwebtoken')
+
 
 const Schema = mongoose.Schema
 
@@ -28,39 +30,56 @@ const userSchema = new Schema({
     
     default: []
   },
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
+  verificationToken: {
+    type: String,
+    default: null,
+  },
 })
 
 // static signup method
-userSchema.statics.signup = async function(email,username, password) {
-
+userSchema.statics.signupWithVerification = async function(email, username, password) {
   // validation
   if (!email || !password || !username) {
-    throw Error('All fields must be filled')
+    throw Error('All fields must be filled');
   }
   if (!validator.isEmail(email)) {
-    throw Error('Your Email is not valid')
+    throw Error('Your Email is not valid');
   }
   if (!validator.isStrongPassword(password)) {
-    throw Error('Your Password is not strong enough , make sure to use at least 8 characters, one uppercase, one lowercase, one number and one special character')
+    throw Error('Your Password is not strong enough, make sure to use at least 8 characters, one uppercase, one lowercase, one number, and one special character');
   }
 
-  const existsEmail = await this.findOne({ email })
-  const existsUsername = await this.findOne({ username })
+  const existsEmail = await this.findOne({ email });
+  const existsUsername = await this.findOne({ username });
 
   if (existsEmail) {
-    throw Error('Email already in use')
+    throw Error('Email already in use');
   }
   if (existsUsername) {
-    throw Error('Username already in use')
+    throw Error('Username already in use');
   }
 
-  const salt = await bcrypt.genSalt(10)
-  const hash = await bcrypt.hash(password, salt)
+  const salt = await bcrypt.genSalt(10);
+  const hash = await bcrypt.hash(password, salt);
 
-  const user = await this.create({ email, username , password: hash })
+  // Generate a verification token
+  const verificationToken = jwt.sign({ email }, process.env.SECRET);
 
-  return user
-}
+  const user = await this.create({
+    email,
+    username,
+    password: hash,
+    verificationToken,
+  });
+
+  // Send the verification email here (similar to what was shown in the previous response)
+
+  return user;
+};
 
 // static login method
 userSchema.statics.login = async function(email, password) {

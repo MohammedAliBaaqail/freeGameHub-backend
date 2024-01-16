@@ -14,7 +14,10 @@ const requireAuth = async (req, res, next) => {
   try {
     const { _id } = jwt.verify(token, process.env.SECRET)
 
-    req.user = await User.findOne({ _id }).select('_id')
+    req.user = await User.findOne({ _id }).select('_id username isVerified')
+    if (!req.user.isVerified) {
+      return res.status(401).json({error: 'Your email is not verified  yet '})
+    }
     next()
 
   } catch (error) {

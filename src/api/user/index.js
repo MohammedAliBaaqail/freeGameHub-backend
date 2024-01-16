@@ -1,8 +1,8 @@
 const express = require('express')
 
 // controller functions
-const { loginUser, signupUser } = require('../../controllers/userController')
-const { getFavouriteGames, addFavouriteGame, removeFavouriteGame } = require('../../controllers/userController')
+const { loginUser, signupUser , verifyUser , getFavouriteGames, addFavouriteGame, removeFavouriteGame  } = require('../../controllers/userController')
+
 
 const requireAuth = require('../../middleware/requireAuth')
 
@@ -14,8 +14,13 @@ router.post('/login', loginUser)
 // signup route
 router.post('/signup', signupUser)
 
+// Verification route
+router.get('/verify', verifyUser);
+
+
+
 // Protect all routes after this middleware
-// router.use(requireAuth)
+router.use(requireAuth)
 // get favourite games of a user
 router.get('/getFavouriteGames/:username', getFavouriteGames)
 
