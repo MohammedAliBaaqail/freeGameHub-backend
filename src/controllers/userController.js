@@ -50,13 +50,24 @@ const signupUser = async (req, res) => {
       text: `Click the following link to verify your email: http://localhost:3000/verify/${user.verificationToken}`,
     };
 
-    transporter.sendMail(verificationEmail, (error, info) => {
-      if (error) {
-        console.error(error);
-      } else {
-        console.log("Verification email sent:", info);
-      }
+    // Verify connection configuration
+    await new Promise((resolve, reject) => {
+      transporter.verify(function (error, success) {
+        if (error) {
+          console.error(error);
+          reject(error);
+        } else {
+          console.log("Server is ready to take our messages");
+          resolve(success);
+        }
+      });
     });
+
+    // Send mail
+    const info = await transporter.sendMail(verificationEmail);
+
+    console.log("Verification email sent:", info);
+
     const token = createToken(user._id);
     // Respond with a success message or the user object without the token
     res.status(200).json({
@@ -70,6 +81,7 @@ const signupUser = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 const verifyUser = async (req, res) => {
   const { token } = req.query;
