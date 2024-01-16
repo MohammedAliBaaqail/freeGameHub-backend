@@ -13,13 +13,15 @@ const port = process.env.PORT || 3000;
 const app = express();
 app.use((req, res, next) => {
     res.setHeader('Permissions-Policy', 'interest-cohort=(), attribution-reporting=*, run-ad-auction=*, join-ad-interest-group=*, browsing-topics=*');
-
     next();
   });
 app.use(cors());
 //middleware
 app.use(express.json());
-
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Internal Server Error');
+  });
 //routes
 app.use('/game/comments' ,commentsRoutes);
 // app.use('/games' ,gamesRoutes);
