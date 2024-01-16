@@ -11,7 +11,11 @@ const userRoutes = require('./api/user')
 const port = process.env.PORT || 3000;
 // Create express app
 const app = express();
+app.use((req, res, next) => {
+    res.setHeader('Permissions-Policy', 'interest-cohort=(), attribution-reporting=*, run-ad-auction=*, join-ad-interest-group=*, browsing-topics=*');
 
+    next();
+  });
 app.use(cors());
 //middleware
 app.use(express.json());
