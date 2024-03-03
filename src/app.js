@@ -15,7 +15,11 @@ app.use((req, res, next) => {
     res.setHeader('Permissions-Policy', 'interest-cohort=(), attribution-reporting=*, run-ad-auction=*, join-ad-interest-group=*, browsing-topics=*');
     next();
   });
-app.use(cors());
+const corsOptions = {
+  origin: 'https://free-game-hub.vercel.app',
+};
+
+app.use(cors(corsOptions));
 //middleware
 app.use(express.json());
 app.use((err, req, res, next) => {
