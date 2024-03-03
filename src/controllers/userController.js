@@ -47,8 +47,7 @@ const signupUser = async (req, res) => {
       from: process.env.EMAIL,
       to: email,
       subject: "Email Verification",
-      text: `Click the following link to verify your email: https://free-game-hub.netlify.app
-      /${user.verificationToken}`,
+      text: `Click the following link to verify your email: https://free-game-hub.vercel.app/verify${user.verificationToken}`,
     };
 
     // Verify connection configuration
